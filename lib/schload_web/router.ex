@@ -18,6 +18,7 @@ defmodule SchloadWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+    post "/dynamic", PageController, :dynamic
   end
 
   # Other scopes may use custom stacks.

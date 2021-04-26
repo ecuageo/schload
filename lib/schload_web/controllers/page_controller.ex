@@ -8,7 +8,6 @@ defmodule SchloadWeb.PageController do
   def dynamic(conn, params) do
     resp = [%{
       body: "https://vid.podium.com",
-      composer_app_item_webhook: "http://localhost:9002/webhook",
       composer_app_item_uid: UUID.uuid1(),
       is_message: true,
       header: "Video Chat",

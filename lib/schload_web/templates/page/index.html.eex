@@ -72,7 +72,7 @@
         isEditable: true
       },
       dynamicSend: {
-        url: "http://localhost:9002/body"
+        url: "http://localhost:4444/dynamic"
       }
     };
     if (window.ReactNativeWebView) {
