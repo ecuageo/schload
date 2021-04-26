@@ -1,38 +1,62 @@
-<section class="phx-hero">
-  <h1><%= gettext "Welcome to %{name}!", name: "Phoenix" %></h1>
-  <p>Peace of mind from prototype to production</p>
-</section>
+<div>
+  <h1>Quote Generator</h1>
+  <form name="generateQuoteForm">
+    <input id="searchTerm" type="text" placeholder="My search term"/>
 
-<section class="row">
-  <article class="column">
-    <h2>Resources</h2>
-    <ul>
-      <li>
-        <a href="https://hexdocs.pm/phoenix/overview.html">Guides &amp; Docs</a>
-      </li>
-      <li>
-        <a href="https://github.com/phoenixframework/phoenix">Source</a>
-      </li>
-      <li>
-        <a href="https://github.com/phoenixframework/phoenix/blob/v1.5/CHANGELOG.md">v1.5 Changelog</a>
-      </li>
-    </ul>
-  </article>
-  <article class="column">
-    <h2>Help</h2>
-    <ul>
-      <li>
-        <a href="https://elixirforum.com/c/phoenix-forum">Forum</a>
-      </li>
-      <li>
-        <a href="https://webchat.freenode.net/?channels=elixir-lang">#elixir-lang on Freenode IRC</a>
-      </li>
-      <li>
-        <a href="https://twitter.com/elixirphoenix">Twitter @elixirphoenix</a>
-      </li>
-      <li>
-        <a href="https://elixir-slackin.herokuapp.com/">Elixir on Slack</a>
-      </li>
-    </ul>
-  </article>
-</section>
+    <div id="searchResults"></div>
+
+    <button
+      name="search"
+      type="button"
+    >
+      Search
+    </button>
+
+    <button
+      name="feelingLucky"
+      type="button"
+    >I'm feeling lucky</button>
+  </form>
+</div>
+
+
+<script type="text/javascript">
+  document.generateQuoteForm.elements.search.onclick = () => searchQuotes(document.getElementById("searchTerm").value);
+  document.generateQuoteForm.elements.feelingLucky.onclick = () => randomQuote();
+
+  const displaySearchResults = (results) => {
+    console.log("results", results)
+    var listDiv = document.getElementById('searchResults');
+    listDiv.innerHTML = '';
+    var ul = document.createElement('ul');
+    for(var i = 0; i < results.length; ++i) {
+      var li = document.createElement('li');
+      var resultDisplay = document.createElement('div');
+      resultDisplay.innerHTML = results[i];
+      resultDisplay.onclick = (e) => {
+        console.log("inject selection into the composer", e.target.innerHTML)
+      }
+      li.appendChild(resultDisplay);
+      ul.appendChild(li);
+    }
+    listDiv.appendChild(ul);
+  }
+
+  function searchQuotes(searchTerm) {
+    fetch(`http://ron-swanson-quotes.herokuapp.com/v2/quotes/search/${searchTerm}`)
+      .then(response => response.json())
+      .then(response => {
+        displaySearchResults(response);
+      })
+  };
+
+  function randomQuote() {
+    fetch(`http://ron-swanson-quotes.herokuapp.com/v2/quotes/`)
+      .then(response => response.json())
+      .then(response => {
+        if(response && response.length > 0) {
+          console.log("we'd inject this into the composer at this point", response[0])
+        }
+      })
+  };
+</script>
