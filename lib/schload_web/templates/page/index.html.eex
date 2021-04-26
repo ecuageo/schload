@@ -1,4 +1,4 @@
-<div>
+<div class="bg-white">
   <h1>Quote Generator</h1>
   <form name="generateQuoteForm">
     <input id="searchTerm" type="text" placeholder="My search term"/>
@@ -16,6 +16,11 @@
       name="feelingLucky"
       type="button"
     >I'm feeling lucky</button>
+
+    <button
+      name="confirm"
+      type="button"
+    >Confirm</button>
   </form>
 </div>
 
@@ -23,6 +28,7 @@
 <script type="text/javascript">
   document.generateQuoteForm.elements.search.onclick = () => searchQuotes(document.getElementById("searchTerm").value);
   document.generateQuoteForm.elements.feelingLucky.onclick = () => randomQuote();
+  document.generateQuoteForm.elements.confirm.onclick = () => confirmQuote();
 
   const displaySearchResults = (results) => {
     console.log("results", results)
@@ -34,7 +40,7 @@
       var resultDisplay = document.createElement('div');
       resultDisplay.innerHTML = results[i];
       resultDisplay.onclick = (e) => {
-        console.log("inject selection into the composer", e.target.innerHTML)
+        confirmQuote(e.target.innerHTML)
       }
       li.appendChild(resultDisplay);
       ul.appendChild(li);
@@ -54,9 +60,40 @@
     fetch(`http://ron-swanson-quotes.herokuapp.com/v2/quotes/`)
       .then(response => response.json())
       .then(response => {
-        if(response && response.length > 0) {
-          console.log("we'd inject this into the composer at this point", response[0])
-        }
+        displaySearchResults(response);
       })
+  };
+
+  function confirmQuote(quote) {
+    const composerAppData = {
+      type: "body",
+      attributes: {
+        text: quote,
+        isEditable: true
+      },
+      dynamicSend: {
+        url: "http://localhost:9002/body"
+      }
+    };
+    if (window.ReactNativeWebView) {
+      //call into Mobile React Native WebView
+      window.ReactNativeWebView.postMessage(
+        JSON.stringify({
+          composerAppData
+        })
+      );
+    } else if (window.parent) {
+      //call into Web iFrame
+      window.parent.postMessage(
+        {
+          composerAppData
+        },
+        "*"
+      );
+    } else {
+      throw new Error(
+        `could not find WebView or iFrame to mount Composer App on.`
+      );
+    }
   };
 </script>
